@@ -19,6 +19,7 @@
  */
 #include "../Engine/State.h"
 #include "Position.h"
+#include "VisibleUnitButton.h"
 
 #include <vector>
 #include <string>
@@ -40,6 +41,7 @@ class BattleItem;
 class Timer;
 class WarningMessage;
 class BattlescapeGame;
+class VisibleUnitButton;
 
 /**
  * Battlescape screen which shows the tactical battle.
@@ -56,10 +58,8 @@ private:
 	InteractiveSurface *_btnStats;
 	BattlescapeButton *_btnReserveNone, *_btnReserveSnap, *_btnReserveAimed, *_btnReserveAuto, *_btnReserveKneel, *_btnZeroTUs;
 	InteractiveSurface *_btnLeftHandItem, *_btnRightHandItem;
-	static const int VISIBLE_MAX = 10;
-	InteractiveSurface *_btnVisibleUnit[VISIBLE_MAX];
-	NumberText *_numVisibleUnit[VISIBLE_MAX];
-	BattleUnit *_visibleUnit[VISIBLE_MAX];
+	VisibleUnitButton *_btnVisibleUnit[VisibleUnitButton::VISIBLE_MAX];
+	VisibleUnitButton *_btnSpottedUnit[VisibleUnitButton::SPOTTED_MAX];
 	WarningMessage *_warning;
 	Text *_txtName;
 	NumberText *_numTimeUnits, *_numEnergy, *_numHealth, *_numMorale, *_numLayers, *_numAmmoLeft, *_numAmmoRight;

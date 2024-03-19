@@ -1,0 +1,24 @@
+interfaces:
+  - type: battlescape
+    elements:
+      - id: visibleUnits
+        pos: [300, -16]
+        size: [15, 12]
+        color: 16 #text
+        color2: 32 #background (cycles over 12 colors. The available 16-color gradients in the default palette are 1=White/Gray 16=BrightOrange 32=Red 48=Green 64=Lime 80=Hemp/Sectoid 96=DullOrange 112=DullBlue 128=Blue 144=Yellow 160=DirtBrown 176=Pink 192=Purple 208=BrightBlue 224=GrayBlue)
+        border: 15
+        value: 270 #direction of subsequent button placement. 0=East/Left-to-right | 90=South/Top-to-bottom | 180=West/Right-to-left | 270=North/Bottom-to-top | -1=Center horizontally/Left-to-right
+        TFTDMode: false #If true, shortens the color gradient cycle to 8 colors as the default TFTD gradients get too similar at the darker end to be able to distinguish between visible/exposed/spotted
+      - id: exposedUnits
+        pos: [300, -16] #Same coords as visibleUnits so grouped with visibleUnits as opposed to spottedUnits
+        size: [15, 12]
+        color: 16
+        color2: 192 #Purple
+        border: 15
+      - id: spottedUnits
+        pos: [300, -16] #Same coords as visibleUnits so grouped with visibleUnits as opposed to getting its own group. Change this to [0, -140] to position the buttons at the top of the screen.
+        size: [15, 12]
+        color: 16
+        color2: 128 #Blue
+        border: 15
+        value: 270 #Change this to -1 to center the buttons horizontally.

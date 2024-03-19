@@ -30,6 +30,15 @@ struct Element
 	int x, y, w, h, color, color2, border;
 	/// defines inversion behaviour
 	bool TFTDMode;
+	// general purpose value
+	int value;
+
+	// Create an element with the specified values and (optionally) overwrite
+	// the values with those from the supplied other element iff the other
+	// element's values are set.
+	Element(int x = 0, int y = 0, int w = 0, int h = 0, int color = 0,
+		int color2 = 0, int border = 0, bool TFTDMode = false, int value = 0,
+		Element const * other = nullptr);
 };
 
 class RuleInterface
