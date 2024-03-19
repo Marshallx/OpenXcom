@@ -1,0 +1,6 @@
+name: "Live Craft Status"
+version: 1.0
+description: "Lists the current status of all craft on the geoscape, including estimated time until ready to relaunch. Left-click opens the craft window, right-click centers on the craft."
+author: TheDash
+
+master: "xcom1"

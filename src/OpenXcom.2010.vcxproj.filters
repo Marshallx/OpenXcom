@@ -951,6 +951,9 @@
     <ClCompile Include="Battlescape\VisibleUnitButton.cpp">
       <Filter>Battlescape</Filter>
     </ClCompile>
+    <ClCompile Include="Geoscape\CraftLiveStatus.cpp">
+      <Filter>Geoscape</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -1941,6 +1944,9 @@
     </ClInclude>
     <ClInclude Include="Battlescape\VisibleUnitButton.h">
       <Filter>Battlescape</Filter>
+    </ClCompile>
+    <ClInclude Include="Geoscape\CraftLiveStatus.h">
+      <Filter>Geoscape</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
