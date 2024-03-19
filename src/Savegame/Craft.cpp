@@ -650,9 +650,10 @@ int Craft::getFuelLimit() const
  * @param base Pointer to target base.
  * @return Fuel amount.
  */
-int Craft::getFuelLimit(Base *base) const
+int Craft::getFuelLimit(Base *base, Target * via) const
 {
-	return (int)floor(getFuelConsumption(_rules->getMaxSpeed()) * getDistance(base) / _speedMaxRadian);
+	double const d = via ? getDistance(via) + via->getDistance(base) : getDistance(base);
+	return (int)floor(getFuelConsumption(_rules->getMaxSpeed()) * d / _speedMaxRadian);
 }
 
 /**
@@ -1077,6 +1078,38 @@ void Craft::reuseItem(const std::string& item)
 	// Check if it's fuel to refuel the craft
 	if (item == _rules->getRefuelItem() && _fuel < _rules->getMaxFuel())
 		_status = "STR_REFUELLING";
+}
+
+
+int Craft::getHoursUntilRepaired()
+{
+	return (int)ceil((double)getDamage() / getRules()->getRepairRate());
+}
+
+int Craft::getHoursUntilRefueled()
+{
+	return (int)ceil((double)(getRules()->getMaxFuel() - getFuel()) / getRules()->getRefuelRate() / 2.0);
+}
+
+int Craft::getHoursUntilRearmed()
+{
+	CraftWeapon *w1 = (getRules()->getWeapons() > 0) ? getWeapons()->at(0) : nullptr;
+	CraftWeapon *w2 = (getRules()->getWeapons() > 1) ? getWeapons()->at(1) : nullptr;
+	return std::max(getHoursUntilRearmed(w1), getHoursUntilRearmed(w2));
+}
+
+int Craft::getHoursUntilRearmed(CraftWeapon *weapon)
+{
+	if (weapon)
+	{
+		return (int)ceil((double)(weapon->getRules()->getAmmoMax() - weapon->getAmmo()) / weapon->getRules()->getRearmRate());
+	}
+	return 0;
+}
+
+int Craft::getHoursUntilReady()
+{
+	return getHoursUntilRepaired() + getHoursUntilRefueled() + getHoursUntilRearmed();
 }
 
 }

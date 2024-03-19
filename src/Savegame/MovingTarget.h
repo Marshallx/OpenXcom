@@ -39,8 +39,6 @@ protected:
 
 	/// Calculates a new speed vector to the destination.
 	virtual void calculateSpeed();
-	/// Converts a speed to radians.
-	static double calculateRadianSpeed(int speed);
 	/// Creates a moving target.
 	MovingTarget();
 public:
@@ -74,6 +72,8 @@ public:
 	void resetMeetPoint();
 	/// Returns if the meeting point was calculated.
 	bool isMeetCalculated() const;
+	/// Converts a speed to radians.
+	static double calculateRadianSpeed(int speed);
 };
 
 }
