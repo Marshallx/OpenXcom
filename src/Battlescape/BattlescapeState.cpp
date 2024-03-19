@@ -35,6 +35,7 @@
 #include "MiniMapState.h"
 #include "BattlescapeGenerator.h"
 #include "BriefingState.h"
+#include "VisibleUnitButton.h"
 #include "../lodepng.h"
 #include "../fmath.h"
 #include "../Engine/Game.h"
@@ -81,8 +82,6 @@ namespace OpenXcom
  */
 BattlescapeState::BattlescapeState() : _reserve(0), _firstInit(true), _isMouseScrolling(false), _isMouseScrolled(false), _xBeforeMouseScrolling(0), _yBeforeMouseScrolling(0), _totalMouseMoveX(0), _totalMouseMoveY(0), _mouseMovedOverThreshold(0), _mouseOverIcons(false), _autosave(false)
 {
-	std::fill_n(_visibleUnit, 10, (BattleUnit*)(0));
-
 	const int screenWidth = Options::baseXResolution;
 	const int screenHeight = Options::baseYResolution;
 	const int iconsWidth = _game->getMod()->getInterface("battlescape")->getElement("icons")->w;
@@ -127,14 +126,30 @@ BattlescapeState::BattlescapeState() : _reserve(0), _firstInit(true), _isMouseSc
 	_numAmmoLeft = new NumberText(30, 5, x + 8, y + 4);
 	_btnRightHandItem = new InteractiveSurface(32, 48, x + 280, y + 4);
 	_numAmmoRight = new NumberText(30, 5, x + 280, y + 4);
-	const int visibleUnitX = _game->getMod()->getInterface("battlescape")->getElement("visibleUnits")->x;
-	const int visibleUnitY = _game->getMod()->getInterface("battlescape")->getElement("visibleUnits")->y;
-	for (int i = 0; i < VISIBLE_MAX; ++i)
+
+	SDLKey buttons[] = {Options::keyBattleCenterEnemy1,
+						Options::keyBattleCenterEnemy2,
+						Options::keyBattleCenterEnemy3,
+						Options::keyBattleCenterEnemy4,
+						Options::keyBattleCenterEnemy5,
+						Options::keyBattleCenterEnemy6,
+						Options::keyBattleCenterEnemy7,
+						Options::keyBattleCenterEnemy8,
+						Options::keyBattleCenterEnemy9,
+						Options::keyBattleCenterEnemy10};
+
+	const Element *visibleUnitsMod = _game->getMod()->getInterface("battlescape")->getElement("visibleUnits");
+	for (int i = 0; i < VisibleUnitButton::VISIBLE_MAX; ++i)
 	{
-		_btnVisibleUnit[i] = new InteractiveSurface(15, 12, x + visibleUnitX, y + visibleUnitY - (i * 13));
-		_numVisibleUnit[i] = new NumberText(15, 12, _btnVisibleUnit[i]->getX() + 6 , _btnVisibleUnit[i]->getY() + 4);
+		_btnVisibleUnit[i] = new VisibleUnitButton(i, x, y, visibleUnitsMod, buttons[i]);
 	}
-	_numVisibleUnit[9]->setX(_numVisibleUnit[9]->getX() - 2); // center number 10
+
+	const Element *spottedUnitsMod = _game->getMod()->getInterface("battlescape")->getElement("spottedUnits");
+	for (int i = 0; i < VisibleUnitButton::SPOTTED_MAX; ++i)
+	{
+		_btnSpottedUnit[i] = new VisibleUnitButton(i, x, y, spottedUnitsMod, buttons[i]);
+	}
+
 	_warning = new WarningMessage(224, 24, x + 48, y + 32);
 	_btnLaunch = new BattlescapeButton(32, 24, screenWidth - 32, 0); // we need screenWidth, because that is independent of the black bars on the screen
 	_btnLaunch->setVisible(false);
@@ -235,10 +250,15 @@ BattlescapeState::BattlescapeState() : _reserve(0), _firstInit(true), _isMouseSc
 	add(_numAmmoLeft, "numAmmoLeft", "battlescape", _icons);
 	add(_btnRightHandItem, "buttonRightHand", "battlescape", _icons);
 	add(_numAmmoRight, "numAmmoRight", "battlescape", _icons);
-	for (int i = 0; i < VISIBLE_MAX; ++i)
+	for (int i = 0; i < VisibleUnitButton::VISIBLE_MAX; ++i)
 	{
-		add(_btnVisibleUnit[i]);
-		add(_numVisibleUnit[i]);
+		add(_btnVisibleUnit[i]->GetButton());
+		add(_btnVisibleUnit[i]->GetCaption());
+	}
+	for (int i = 0; i < VisibleUnitButton::SPOTTED_MAX; ++i)
+	{
+		add(_btnSpottedUnit[i]->GetButton());
+		add(_btnSpottedUnit[i]->GetCaption());
 	}
 	add(_warning, "warning", "battlescape", _icons);
 	add(_txtDebug);
@@ -409,29 +429,6 @@ BattlescapeState::BattlescapeState() : _reserve(0), _firstInit(true), _isMouseSc
 	_btnStats->onKeyboardPress((ActionHandler)&BattlescapeState::btnReloadClick, Options::keyBattleReload);
 	_btnStats->onKeyboardPress((ActionHandler)&BattlescapeState::btnPersonalLightingClick, Options::keyBattlePersonalLighting);
 
-	SDLKey buttons[] = {Options::keyBattleCenterEnemy1,
-						Options::keyBattleCenterEnemy2,
-						Options::keyBattleCenterEnemy3,
-						Options::keyBattleCenterEnemy4,
-						Options::keyBattleCenterEnemy5,
-						Options::keyBattleCenterEnemy6,
-						Options::keyBattleCenterEnemy7,
-						Options::keyBattleCenterEnemy8,
-						Options::keyBattleCenterEnemy9,
-						Options::keyBattleCenterEnemy10};
-	Uint8 color = _game->getMod()->getInterface("battlescape")->getElement("visibleUnits")->color;
-	for (int i = 0; i < VISIBLE_MAX; ++i)
-	{
-		std::ostringstream tooltip;
-		_btnVisibleUnit[i]->onMouseClick((ActionHandler)&BattlescapeState::btnVisibleUnitClick);
-		_btnVisibleUnit[i]->onKeyboardPress((ActionHandler)&BattlescapeState::btnVisibleUnitClick, buttons[i]);
-		tooltip << "STR_CENTER_ON_ENEMY_" << (i+1);
-		_btnVisibleUnit[i]->setTooltip(tooltip.str());
-		_btnVisibleUnit[i]->onMouseIn((ActionHandler)&BattlescapeState::txtTooltipIn);
-		_btnVisibleUnit[i]->onMouseOut((ActionHandler)&BattlescapeState::txtTooltipOut);
-		_numVisibleUnit[i]->setColor(color);
-		_numVisibleUnit[i]->setValue(i+1);
-	}
 	_warning->setColor(_game->getMod()->getInterface("battlescape")->getElement("warning")->color2);
 	_warning->setTextColor(_game->getMod()->getInterface("battlescape")->getElement("warning")->color);
 	_btnLaunch->onMouseClick((ActionHandler)&BattlescapeState::btnLaunchClick);
@@ -1166,23 +1163,27 @@ void BattlescapeState::btnRightHandItemClick(Action *)
  */
 void BattlescapeState::btnVisibleUnitClick(Action *action)
 {
-	int btnID = -1;
+	// Consume the event
+	action->getDetails()->type = SDL_NOEVENT;
 
-	// got to find out which button was pressed
-	for (int i = 0; i < VISIBLE_MAX && btnID == -1; ++i)
+	// Find out which button was pressed
+	for (int i = 0; i < VisibleUnitButton::VISIBLE_MAX; ++i)
 	{
-		if (action->getSender() == _btnVisibleUnit[i])
+		if (action->getSender() == _btnVisibleUnit[i]->GetButton())
 		{
-			btnID = i;
+			_map->getCamera()->centerOnPosition(_btnVisibleUnit[i]->GetUnit()->getPosition());
+			return;
 		}
 	}
 
-	if (btnID != -1)
+	for (int i = 0; i < VisibleUnitButton::SPOTTED_MAX; ++i)
 	{
-		_map->getCamera()->centerOnPosition(_visibleUnit[btnID]->getPosition());
+		if (action->getSender() == _btnSpottedUnit[i]->GetButton())
+		{
+			_map->getCamera()->centerOnPosition(_btnSpottedUnit[i]->GetUnit()->getPosition());
+			return;
+		}
 	}
-
-	action->getDetails()->type = SDL_NOEVENT; // consume the event
 }
 
 /**
@@ -1277,11 +1278,14 @@ void BattlescapeState::updateSoldierInfo(bool checkFOV)
 {
 	BattleUnit *battleUnit = _save->getSelectedUnit();
 
-	for (int i = 0; i < VISIBLE_MAX; ++i)
+	for (int i = 0; i < VisibleUnitButton::VISIBLE_MAX; ++i)
 	{
-		_btnVisibleUnit[i]->setVisible(false);
-		_numVisibleUnit[i]->setVisible(false);
-		_visibleUnit[i] = 0;
+		_btnVisibleUnit[i]->Reset();
+	}
+
+	for (int i = 0; i < VisibleUnitButton::SPOTTED_MAX; ++i)
+	{
+		_btnSpottedUnit[i]->Reset();
 	}
 
 	bool playableUnit = _battleGame->playableUnitSelected();
@@ -1372,14 +1376,88 @@ void BattlescapeState::updateSoldierInfo(bool checkFOV)
 	{
 		_save->getTileEngine()->calculateFOV(_save->getSelectedUnit());
 	}
-	int j = 0;
-	for (std::vector<BattleUnit*>::iterator i = battleUnit->getVisibleUnits()->begin(); i != battleUnit->getVisibleUnits()->end() && j < VISIBLE_MAX; ++i)
+
+	// Visible Unit ("center on enemy") Buttons
+	Element *visibleUnitsMod = _game->getMod()->getInterface("battlescape")->getElement("visibleUnits");
+
+	int buttonIndex = 0;
+	int buttonCountVisible = 0;
+	for (std::vector<BattleUnit *>::iterator i = battleUnit->getVisibleUnits()->begin(); i != battleUnit->getVisibleUnits()->end() && buttonCountVisible < VisibleUnitButton::VISIBLE_MAX && buttonIndex < VisibleUnitButton::TOTAL_MAX; ++i)
 	{
-		_btnVisibleUnit[j]->setVisible(true);
-		_numVisibleUnit[j]->setVisible(true);
-		_visibleUnit[j] = (*i);
-		++j;
+		_btnVisibleUnit[buttonCountVisible++]->Enable(++buttonIndex, *i, visibleUnitsMod);
 	}
+
+    Element *exposedUnitsMod = _game->getMod()->getInterface("battlescape")->getElement("exposedUnits");
+	Element *spottedUnitsMod = _game->getMod()->getInterface("battlescape")->getElement("spottedUnits");
+
+	if (!exposedUnitsMod)
+	{
+		exposedUnitsMod = spottedUnitsMod;
+	}
+
+	if (spottedUnitsMod || exposedUnitsMod)
+	{
+		int buttonCountSpotted = 0;
+
+		VisibleUnitButton **buttonSet;
+		int buttonMax;
+		int *buttonCount;
+
+		// Add exposed enemies first, because the selected soldier is more likely to care about those than enemies only targetable by comrades (or grenades/launchers).
+		Position pos = _save->getTileEngine()->getSightOriginVoxel(battleUnit);
+		Position unused;
+		if (VisibleUnitButton::ShareButtonSpace(visibleUnitsMod, exposedUnitsMod))
+		{
+			buttonSet = _btnVisibleUnit;
+			buttonMax = VisibleUnitButton::VISIBLE_MAX;
+			buttonCount = &buttonCountVisible;
+		}
+		else
+		{
+			buttonSet = _btnSpottedUnit;
+			buttonMax = VisibleUnitButton::SPOTTED_MAX;
+			buttonCount = &buttonCountSpotted;
+		}
+
+		for (std::vector<BattleUnit *>::iterator i = _save->getUnits()->begin(); i != _save->getUnits()->end() && *buttonCount < buttonMax && buttonIndex < VisibleUnitButton::TOTAL_MAX; ++i)
+		{
+			if (VisibleUnitButton::TargetIsEligible(*i, _btnVisibleUnit, _btnSpottedUnit) &&
+				_save->getTileEngine()->canTargetUnit(&pos, (*i)->getTile(), &unused, battleUnit, false))
+			{
+				buttonSet[(*buttonCount)++]->Enable(++buttonIndex, *i, exposedUnitsMod);
+			}
+		}
+
+		// Now add any enemies that have been spotted but that the selected soldier has no line-of-fire for.
+		if (spottedUnitsMod)
+		{
+			if (VisibleUnitButton::ShareButtonSpace(visibleUnitsMod, spottedUnitsMod))
+			{
+				buttonSet = _btnVisibleUnit;
+				buttonMax = VisibleUnitButton::VISIBLE_MAX;
+				buttonCount = &buttonCountVisible;
+			}
+			else
+			{
+				buttonSet = _btnSpottedUnit;
+				buttonMax = VisibleUnitButton::SPOTTED_MAX;
+				buttonCount = &buttonCountSpotted;
+			}
+
+			for (std::vector<BattleUnit *>::iterator i = _save->getUnits()->begin(); i != _save->getUnits()->end() && *buttonCount < buttonMax && buttonIndex < VisibleUnitButton::TOTAL_MAX; ++i)
+			{
+				if (VisibleUnitButton::TargetIsEligible(*i, _btnVisibleUnit, _btnSpottedUnit))
+				{
+					buttonSet[(*buttonCount)++]->Enable(++buttonIndex, *i, spottedUnitsMod);
+				}
+			}
+		}
+
+		VisibleUnitButton::Recenter(Options::baseXResolution, buttonCountSpotted, _btnSpottedUnit, spottedUnitsMod);
+	}
+
+	VisibleUnitButton::Recenter(Options::baseXResolution, buttonCountVisible, _btnVisibleUnit, visibleUnitsMod);
+	
 
 	showPsiButton(battleUnit->getSpecialWeapon(BT_PSIAMP) != 0);
 }
@@ -1426,21 +1504,35 @@ BattleItem *BattlescapeState::getSpecialMeleeWeapon(BattleUnit *battleUnit)
  */
 void BattlescapeState::blinkVisibleUnitButtons()
 {
-	static int delta = 1, color = 32;
+	static int delta = 1, offset = 0;
+	static int shortDelta = 1, shortOffset = 0;
 
-	for (int i = 0; i < VISIBLE_MAX;  ++i)
+	for (int i = 0; i < VisibleUnitButton::VISIBLE_MAX;  ++i)
 	{
-		if (_btnVisibleUnit[i]->getVisible() == true)
+		if (_btnVisibleUnit[i]->GetButton()->getVisible() == true)
 		{
-			_btnVisibleUnit[i]->drawRect(0, 0, 15, 12, 15);
-			_btnVisibleUnit[i]->drawRect(1, 1, 13, 10, color);
+			_btnVisibleUnit[i]->GetButton()->drawRect(0, 0, 15, 12, _btnVisibleUnit[i]->GetBorderColor());
+			_btnVisibleUnit[i]->GetButton()->drawRect(1, 1, 13, 10, _btnVisibleUnit[i]->GetBackgroundColor() + (_btnVisibleUnit[i]->UseShortCycle() ? shortOffset : offset));
 		}
 	}
 
-	if (color == 44) delta = -2;
-	if (color == 32) delta = 1;
+	for (int i = 0; i < VisibleUnitButton::SPOTTED_MAX; ++i)
+	{
+		if (_btnSpottedUnit[i]->GetButton()->getVisible() == true)
+		{
+			_btnSpottedUnit[i]->GetButton()->drawRect(0, 0, 15, 12, _btnSpottedUnit[i]->GetBorderColor());
+			_btnSpottedUnit[i]->GetButton()->drawRect(1, 1, 13, 10, _btnSpottedUnit[i]->GetBackgroundColor() + (_btnSpottedUnit[i]->UseShortCycle() ? shortOffset : offset));
+		}
+	}
 
-	color += delta;
+	if (offset == 12) delta = -2;
+	if (offset == 0) delta = 1;
+
+	if (shortOffset == 8) shortDelta = -2;
+	if (shortOffset == 0) shortDelta = 1;
+
+	offset += delta;
+	shortOffset += shortDelta;
 }
 
 /**

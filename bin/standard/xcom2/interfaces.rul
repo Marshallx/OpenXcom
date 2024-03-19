@@ -1508,10 +1508,12 @@ interfaces: #done
         color2: 47
       - id: messageWindowBorder
         color: -1
-      # The usage of the following is hard-coded, these ones MUST be defined
       - id: visibleUnits
         pos: [300, -16]
         color: 1
+        color2: 32
+        border: 15
+      # The usage of the following is hard-coded, these ones MUST be defined
       - id: icons
         size: [320, 56]
         TFTDMode: true

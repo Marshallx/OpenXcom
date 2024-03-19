@@ -1,0 +1,6 @@
+name: "Spotted Unit Buttons"
+version: 1.0
+description: "Shows center-on-enemy buttons for all enemy units spotted this turn, not just those that are currently in sight of the selected unit."
+author: TheDash
+
+master: xcom2

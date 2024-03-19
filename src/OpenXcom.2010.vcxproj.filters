@@ -948,6 +948,9 @@
     <ClCompile Include="Menu\OptionsFoldersState.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
+    <ClCompile Include="Battlescape\VisibleUnitButton.cpp">
+      <Filter>Battlescape</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -1935,6 +1938,9 @@
     </ClInclude>
     <ClInclude Include="Menu\OptionsFoldersState.h">
       <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Battlescape\VisibleUnitButton.h">
+      <Filter>Battlescape</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

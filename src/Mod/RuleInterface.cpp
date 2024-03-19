@@ -23,6 +23,24 @@
 namespace OpenXcom
 {
 
+	Element::Element(int const x, int const y, int const w, int const h,
+		int const color, int const color2, int const border,
+		bool const TFTDMode, int const value, Element const * other)
+	: x(x), y(y), w(w), h(h), color(color), color2(color2), border(border),
+		TFTDMode(TFTDMode), value(value)
+	{
+		if (!other) return;
+		if (other->border != INT_MAX) this->border = other->border;
+		if (other->color != INT_MAX) this->color = other->color;
+		if (other->color2 != INT_MAX) this->color2 = other->color2;
+		if (other->value != INT_MAX) this->value = other->value;
+		if (other->x != INT_MAX) this->x = other->x;
+		if (other->y != INT_MAX) this->y = other->y;
+		if (other->w != INT_MAX) this->w = other->w;
+		if (other->h != INT_MAX) this->h = other->h;
+		this->TFTDMode = other->TFTDMode;
+	}
+
 /**
  * Creates a blank ruleset for a certain
  * type of interface, containing an index of elements that make it up.
@@ -72,6 +90,7 @@ void RuleInterface::load(const YAML::Node& node)
 		element.color2 = (*i)["color2"].as<int>(INT_MAX);
 		element.border = (*i)["border"].as<int>(INT_MAX);
 		element.TFTDMode = (*i)["TFTDMode"].as<bool>(false);
+		element.value = (*i)["value"].as<int>(INT_MAX);
 
 		std::string id = (*i)["id"].as<std::string>("");
 		_elements[id] = element;
