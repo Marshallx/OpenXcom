@@ -120,51 +120,7 @@ GeoscapeCraftState::GeoscapeCraftState(Craft *craft, Globe *globe, Waypoint *way
 	_txtTitle->setText(_craft->getName(_game->getLanguage()));
 
 	_txtStatus->setWordWrap(true);
-	std::string status;
-	if (_waypoint != 0)
-	{
-		status = tr("STR_INTERCEPTING_UFO").arg(_waypoint->getId());
-	}
-	else if (_craft->getLowFuel())
-	{
-		status = tr("STR_LOW_FUEL_RETURNING_TO_BASE");
-	}
-	else if (_craft->getMissionComplete())
-	{
-		status = tr("STR_MISSION_COMPLETE_RETURNING_TO_BASE");
-	}
-	else if (_craft->getDestination() == 0)
-	{
-		status = tr("STR_PATROLLING");
-	}
-	else if (_craft->getDestination() == (Target*)_craft->getBase())
-	{
-		status = tr("STR_RETURNING_TO_BASE");
-	}
-	else
-	{
-		Ufo *u = dynamic_cast<Ufo*>(_craft->getDestination());
-		if (u != 0)
-		{
-			if (_craft->isInDogfight())
-			{
-				status = tr("STR_TAILING_UFO");
-			}
-			else if (u->getStatus() == Ufo::FLYING)
-			{
-				status = tr("STR_INTERCEPTING_UFO").arg(u->getId());
-			}
-			else
-			{
-				status = tr("STR_DESTINATION_UC_").arg(u->getName(_game->getLanguage()));
-			}
-		}
-		else
-		{
-			status = tr("STR_DESTINATION_UC_").arg(_craft->getDestination()->getName(_game->getLanguage()));
-		}
-	}
-	_txtStatus->setText(tr("STR_STATUS_").arg(status));
+	_txtStatus->setText(tr("STR_STATUS_").arg(GetDetailedStatusMessage(_craft, this)));
 
 	_txtBase->setText(tr("STR_BASE_UC").arg(_craft->getBase()->getName()));
 
@@ -306,6 +262,51 @@ void GeoscapeCraftState::btnCancelClick(Action *)
 	}
 	// Cancel
 	_game->popState();
+}
+
+std::string GeoscapeCraftState::GetDetailedStatusMessage(Craft const * craft, State const * state)
+{
+	if (craft->getLowFuel())
+	{
+		return state->tr("STR_LOW_FUEL_RETURNING_TO_BASE");
+	}
+	else if (craft->getMissionComplete())
+	{
+		return state->tr("STR_MISSION_COMPLETE_RETURNING_TO_BASE");
+	}
+	else if (craft->getDestination() == 0)
+	{
+		return (craft->getStatus() == "STR_OUT")
+			? state->tr("STR_PATROLLING")
+			: state->tr(craft->getStatus());
+	}
+	else if (craft->getDestination() == (Target *)craft->getBase())
+	{
+		return state->tr("STR_RETURNING_TO_BASE");
+	}
+	else
+	{
+		Ufo * u = dynamic_cast<Ufo *>(craft->getDestination());
+		if (u != 0)
+		{
+			if (craft->isInDogfight())
+			{
+				return state->tr("STR_TAILING_UFO");
+			}
+			else if (u->getStatus() == Ufo::FLYING)
+			{
+				return state->tr("STR_INTERCEPTING_UFO").arg(u->getId());
+			}
+			else
+			{
+				return state->tr("STR_DESTINATION_UC_").arg(u->getName(_game->getLanguage()));
+			}
+		}
+		else
+		{
+			return state->tr("STR_DESTINATION_UC_").arg(craft->getDestination()->getName(_game->getLanguage()));
+		}
+	}
 }
 
 }

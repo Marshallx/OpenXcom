@@ -132,7 +132,7 @@ public:
 	/// Gets the craft's minimum fuel limit.
 	int getFuelLimit() const;
 	/// Gets the craft's minimum fuel limit to go to a base.
-	int getFuelLimit(Base *base) const;
+	int getFuelLimit(Base * base, Target * via = nullptr) const;
 
 	double getBaseRange() const;
 	/// Returns the craft to its base.
@@ -179,6 +179,12 @@ public:
 	void unload(const Mod *mod);
 	/// Reuses a base item.
 	void reuseItem(const std::string &item);
+
+	int getHoursUntilRepaired();
+	int getHoursUntilRefueled();
+	int getHoursUntilRearmed();
+	int getHoursUntilRearmed(CraftWeapon *weapon);
+	int getHoursUntilReady();
 };
 
 }

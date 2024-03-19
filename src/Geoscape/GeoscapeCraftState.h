@@ -56,6 +56,7 @@ public:
 	void btnPatrolClick(Action *action);
 	/// Handler for clicking the Cancel button.
 	void btnCancelClick(Action *action);
+	static std::string GetDetailedStatusMessage(Craft const * craft, State const * state);
 };
 
 }

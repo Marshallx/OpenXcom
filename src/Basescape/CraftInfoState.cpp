@@ -166,8 +166,7 @@ void CraftInfoState::init()
 	firlsLine << tr("STR_DAMAGE_UC_").arg(Unicode::formatPercentage(_craft->getDamagePercentage()));
 	if (_craft->getStatus() == "STR_REPAIRS" && _craft->getDamage() > 0)
 	{
-		int damageHours = (int)ceil((double)_craft->getDamage() / _craft->getRules()->getRepairRate());
-		firlsLine << formatTime(damageHours);
+		firlsLine << formatTime(_craft->getHoursUntilRepaired());
 	}
 	_txtDamage->setText(firlsLine.str());
 
@@ -175,8 +174,7 @@ void CraftInfoState::init()
 	secondLine << tr("STR_FUEL").arg(Unicode::formatPercentage(_craft->getFuelPercentage()));
 	if (_craft->getStatus() == "STR_REFUELLING" && _craft->getRules()->getMaxFuel() - _craft->getFuel() > 0)
 	{
-		int fuelHours = (int)ceil((double)(_craft->getRules()->getMaxFuel() - _craft->getFuel()) / _craft->getRules()->getRefuelRate() / 2.0);
-		secondLine << formatTime(fuelHours);
+		secondLine << formatTime(_craft->getHoursUntilRefueled());
 	}
 	_txtFuel->setText(secondLine.str());
 
@@ -237,8 +235,7 @@ void CraftInfoState::init()
 			leftWeaponLine << tr("STR_MAX").arg(w1->getRules()->getAmmoMax());
 			if (_craft->getStatus() == "STR_REARMING" && w1->getAmmo() < w1->getRules()->getAmmoMax())
 			{
-				int rearmHours = (int)ceil((double)(w1->getRules()->getAmmoMax() - w1->getAmmo()) / w1->getRules()->getRearmRate());
-				leftWeaponLine << formatTime(rearmHours);
+				leftWeaponLine << formatTime(_craft->getHoursUntilRearmed(w1));
 			}
 			_txtW1Ammo->setText(leftWeaponLine.str());
 		}
@@ -276,8 +273,7 @@ void CraftInfoState::init()
 			rightWeaponLine << tr("STR_MAX").arg(w2->getRules()->getAmmoMax());
 			if (_craft->getStatus() == "STR_REARMING" && w2->getAmmo() < w2->getRules()->getAmmoMax())
 			{
-				int rearmHours = (int)ceil((double)(w2->getRules()->getAmmoMax() - w2->getAmmo()) / w2->getRules()->getRearmRate());
-				rightWeaponLine << formatTime(rearmHours);
+				rightWeaponLine << formatTime(_craft->getHoursUntilRearmed(w2));
 			}
 			_txtW2Ammo->setText(rightWeaponLine.str());
 		}
