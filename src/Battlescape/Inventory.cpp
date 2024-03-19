@@ -821,10 +821,13 @@ bool Inventory::unload()
 	}
 
 	// Hands must be free
+	bool bothHandsEmpty = true;
 	for (std::vector<BattleItem*>::iterator i = _selUnit->getInventory()->begin(); i != _selUnit->getInventory()->end(); ++i)
 	{
 		if ((*i)->getSlot()->getType() == INV_HAND && (*i) != _selItem)
 		{
+			bothHandsEmpty = false;
+			if (!_tu) break;
 			_warning->showMessage(_game->getLanguage()->getString("STR_BOTH_HANDS_MUST_BE_EMPTY"));
 			return false;
 		}
@@ -832,20 +835,33 @@ bool Inventory::unload()
 
 	if (!_tu || _selUnit->spendTimeUnits(8))
 	{
-		moveItem(_selItem->getAmmoItem(), _game->getMod()->getInventory("STR_LEFT_HAND", true), 0, 0);
-		_selItem->getAmmoItem()->moveToOwner(_selUnit);
-		moveItem(_selItem, _game->getMod()->getInventory("STR_RIGHT_HAND", true), 0, 0);
-		_selItem->moveToOwner(_selUnit);
-		_selItem->setAmmoItem(0);
-		setSelectedItem(0);
-	}
-	else
-	{
-		_warning->showMessage(_game->getLanguage()->getString("STR_NOT_ENOUGH_TIME_UNITS"));
-		return false;
+		if (bothHandsEmpty)
+		{
+			moveItem(_selItem->getAmmoItem(), _game->getMod()->getInventory("STR_LEFT_HAND", true), 0, 0);
+			_selItem->getAmmoItem()->moveToOwner(_selUnit);
+			moveItem(_selItem, _game->getMod()->getInventory("STR_RIGHT_HAND", true), 0, 0);
+			_selItem->moveToOwner(_selUnit);
+			_selItem->setAmmoItem(0);
+			setSelectedItem(0);
+		}
+		else
+		{
+			// Loadout phase, don't need hands free to unload and drop
+			RuleInventory *ground = _game->getMod()->getInventory("STR_GROUND", true);
+			// TODO Is there a better way to drop the item and auto re-stack than arbitrary slot positions?
+			moveItem(_selItem->getAmmoItem(), ground, 9900, 0);
+			_selItem->getAmmoItem()->moveToOwner(0);
+			moveItem(_selItem->getAmmoItem(), ground, 10000, 0);
+			_selItem->moveToOwner(0);
+			_selItem->setAmmoItem(0);
+			setSelectedItem(0);
+			arrangeGround(true);
+		}
+		return true;
 	}
 
-	return true;
+	_warning->showMessage(_game->getLanguage()->getString("STR_NOT_ENOUGH_TIME_UNITS"));
+	return false;
 }
 
 /**
