@@ -1,0 +1,5 @@
+name: "PSX Sound Effects"
+version: 1.0b
+description: "Play the sound effects from the PlayStation version, replacing the PC ones."
+author: "sylandro"
+master: "xcom2"
