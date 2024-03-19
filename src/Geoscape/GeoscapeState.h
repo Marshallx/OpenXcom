@@ -34,6 +34,7 @@ class Ufo;
 class MissionSite;
 class Base;
 class RuleMissionScript;
+class CraftLiveStatus;
 
 /**
  * Geoscape screen which shows an overview of
@@ -41,7 +42,8 @@ class RuleMissionScript;
  */
 class GeoscapeState : public State
 {
-private:
+friend class CraftLiveStatus;
+public:
 	Surface *_bg, *_sideLine, *_sidebar;
 	Globe *_globe;
 	TextButton *_btnIntercept, *_btnBases, *_btnGraphs, *_btnUfopaedia, *_btnOptions, *_btnFunding;
@@ -56,6 +58,8 @@ private:
 	std::list<State*> _popups;
 	std::list<DogfightState*> _dogfights, _dogfightsToBeStarted;
 	size_t _minimizedDogfights;
+	CraftLiveStatus *_liveCraft; // Mod
+
 public:
 	/// Creates the Geoscape state.
 	GeoscapeState();
@@ -149,12 +153,15 @@ public:
 	void handleBaseDefense(Base *base, Ufo *ufo);
 	/// Update the resolution settings, we just resized the window.
 	void resize(int &dX, int &dY);
+	bool buttonsDisabled();
+	void LiveCraftStatusLeftClick(Action * action);
+	void LiveCraftStatusRightClick(Action * action);
+	void LiveCraftToggleLeftClick(Action * action);
 private:
 	/// Handle alien mission generation.
 	void determineAlienMissions();
 	/// Process each individual mission script command.
 	bool processCommand(RuleMissionScript *command);
-	bool buttonsDisabled();
 };
 
 }

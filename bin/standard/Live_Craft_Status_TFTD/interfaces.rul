@@ -1,0 +1,37 @@
+interfaces:
+  - type: craftLiveStatus
+    elements:
+      - id: textCraft
+        pos: [2,2]
+        size: [59,9]
+        color: 1 #column header
+        value: 10 #max number of craft to show
+      - id: textFuel
+        pos: [61,2]
+        size: [17,9]
+        color: 1 #column header
+        color2: 124 #craft fuel critical (returning to base)
+        border: 114 #craft fuel warning (not enough to reach target)
+      - id: textDamage
+        pos: [78,2]
+        size: [27,9]
+        color: 1 #column header
+        color2: 124 #craft damaged a lot
+        border: 114 #craft damaged a little
+        value: 50 #damage threshold (less damage than this, use border color. Otherwise use color2
+      - id: textReady
+        pos: [105,2]
+        size: [21,9]
+        color: 1 #column header
+      - id: textStatus
+        pos: [126,2]
+        size: [999,9]
+        color: 1 #column header
+        color2: 239 #craft ready
+        border: 124 #craft unarmed warning
+        value: 2 #Only show craft that are: 0=OUT, 1=OUT/REPAIRING/REFUELING/REARMING/TRANSFERRING, 2=ALL
+      - id: list
+        pos: [2,10]
+        size: [999,200]
+        color: 1 #default text
+        value: 0 #margin

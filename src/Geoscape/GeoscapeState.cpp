@@ -105,6 +105,7 @@
 #include "../Mod/AlienDeployment.h"
 #include "../Mod/RuleInterface.h"
 #include "../fmath.h"
+#include "CraftLiveStatus.h"
 
 namespace OpenXcom
 {
@@ -382,6 +383,8 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 	_dogfightTimer->onTimer((StateHandler)&GeoscapeState::handleDogfights);
 
 	timeDisplay();
+
+	_liveCraft = new CraftLiveStatus(this);
 }
 
 /**
@@ -550,6 +553,8 @@ void GeoscapeState::init()
 void GeoscapeState::think()
 {
 	State::think();
+
+	_liveCraft->Think(this);
 
 	_zoomInEffectTimer->think(this, 0);
 	_zoomOutEffectTimer->think(this, 0);
@@ -837,7 +842,6 @@ void GeoscapeState::time5Seconds()
 							w->setLongitude(u->getLongitude());
 							w->setLatitude(u->getLatitude());
 							w->setId(u->getId());
-							(*j)->setDestination(0);
 							popup(new GeoscapeCraftState((*j), _globe, w));
 						}
 					}
@@ -2737,9 +2741,28 @@ void GeoscapeState::resize(int &dX, int &dY)
 	_sideLine->setY(0);
 	_sideLine->drawRect(0, 0, _sideLine->getWidth(), _sideLine->getHeight(), 15);
 }
+
 bool GeoscapeState::buttonsDisabled()
 {
 	return _zoomInEffectTimer->isRunning() || _zoomOutEffectTimer->isRunning();
+}
+
+void GeoscapeState::LiveCraftStatusLeftClick(Action * action)
+{
+	action->getDetails()->type = SDL_NOEVENT; // Consume the event
+	_liveCraft->HandleLeftClick(this);
+}
+
+void GeoscapeState::LiveCraftStatusRightClick(Action * action)
+{
+	action->getDetails()->type = SDL_NOEVENT; // Consume the event
+	_liveCraft->HandleRightClick(this);
+}
+
+void GeoscapeState::LiveCraftToggleLeftClick(Action * action)
+{
+	action->getDetails()->type = SDL_NOEVENT; // Consume the event
+	_liveCraft->Toggle(this);
 }
 
 }
