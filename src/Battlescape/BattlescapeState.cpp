@@ -302,12 +302,14 @@ BattlescapeState::BattlescapeState() : _reserve(0), _firstInit(true), _isMouseSc
 	_btnKneel->allowToggleInversion();
 
 	_btnInventory->onMouseClick((ActionHandler)&BattlescapeState::btnInventoryClick);
+	_btnInventory->onMouseClick((ActionHandler)&BattlescapeState::btnFaveSoldierSetClick, SDL_BUTTON_MIDDLE);
 	_btnInventory->onKeyboardPress((ActionHandler)&BattlescapeState::btnInventoryClick, Options::keyBattleInventory);
 	_btnInventory->setTooltip("STR_INVENTORY");
 	_btnInventory->onMouseIn((ActionHandler)&BattlescapeState::txtTooltipIn);
 	_btnInventory->onMouseOut((ActionHandler)&BattlescapeState::txtTooltipOut);
 
 	_btnCenter->onMouseClick((ActionHandler)&BattlescapeState::btnCenterClick);
+	_btnCenter->onMouseClick((ActionHandler)&BattlescapeState::btnFaveSoldierCenterClick, SDL_BUTTON_MIDDLE);
 	_btnCenter->onKeyboardPress((ActionHandler)&BattlescapeState::btnCenterClick, Options::keyBattleCenterUnit);
 	_btnCenter->setTooltip("STR_CENTER_SELECTED_UNIT");
 	_btnCenter->onMouseIn((ActionHandler)&BattlescapeState::txtTooltipIn);
@@ -315,6 +317,7 @@ BattlescapeState::BattlescapeState() : _reserve(0), _firstInit(true), _isMouseSc
 
 	_btnNextSoldier->onMouseClick((ActionHandler)&BattlescapeState::btnNextSoldierClick);
 	_btnNextSoldier->onMouseClick((ActionHandler)&BattlescapeState::btnPrevSoldierClick, SDL_BUTTON_RIGHT);
+	_btnNextSoldier->onMouseClick((ActionHandler)&BattlescapeState::btnFaveSoldierSelectClick, SDL_BUTTON_MIDDLE);
 	_btnNextSoldier->onKeyboardPress((ActionHandler)&BattlescapeState::btnNextSoldierClick, Options::keyBattleNextUnit);
 	_btnNextSoldier->onKeyboardPress((ActionHandler)&BattlescapeState::btnPrevSoldierClick, Options::keyBattlePrevUnit);
 	_btnNextSoldier->setTooltip("STR_NEXT_UNIT");
@@ -946,6 +949,19 @@ void BattlescapeState::btnCenterClick(Action *)
 }
 
 /**
+ * Centers on the user-favorited soldier.
+ * @param action Pointer to an action.
+ */
+void BattlescapeState::btnFaveSoldierCenterClick(Action *)
+{
+	if (!allowButtons()) return;
+	auto unit = _save->getFavoriteUnit();
+	if (!unit) return;
+	_map->getCamera()->centerOnPosition(unit->getPosition());
+	_map->refreshSelectorPosition();
+}
+
+/**
  * Selects the next soldier.
  * @param action Pointer to an action.
  */
@@ -982,6 +998,33 @@ void BattlescapeState::btnPrevSoldierClick(Action *)
 		selectPreviousPlayerUnit(true);
 		_map->refreshSelectorPosition();
 	}
+}
+
+/**
+ * Selects favorite soldier.
+ * @param action Pointer to an action.
+ */
+void BattlescapeState::btnFaveSoldierSelectClick(Action *)
+{
+	if (!allowButtons()) return;
+	auto unit = _save->getFavoriteUnit();
+	if (!unit) return;
+	_save->setSelectedUnit(unit);
+	updateSoldierInfo();
+	_map->getCamera()->centerOnPosition(unit->getPosition());
+	_battleGame->cancelAllActions();
+	_battleGame->getCurrentAction()->actor = unit;
+	_battleGame->setupCursor();
+}
+
+/**
+ * Sets favorite soldier.
+ * @param action Pointer to an action.
+ */
+void BattlescapeState::btnFaveSoldierSetClick(Action *)
+{
+	if (!allowButtons()) return;
+	_save->setFavoriteUnit(_save->getSelectedUnit());
 }
 
 /**

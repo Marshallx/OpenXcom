@@ -51,7 +51,7 @@ private:
 	int _mapsize_x, _mapsize_y, _mapsize_z;
 	std::vector<MapDataSet*> _mapDataSets;
 	Tile **_tiles;
-	BattleUnit *_selectedUnit, *_lastSelectedUnit;
+	BattleUnit *_selectedUnit, *_lastSelectedUnit, *_favoriteUnit;
 	std::vector<Node*> _nodes;
 	std::vector<BattleUnit*> _units;
 	std::vector<BattleItem*> _items, _deleted;
@@ -155,6 +155,10 @@ public:
 	BattleUnit *getSelectedUnit() const;
 	/// Sets the currently selected unit.
 	void setSelectedUnit(BattleUnit *unit);
+	/// Gets the user-favorited unit.
+	BattleUnit * getFavoriteUnit() const;
+	/// Sets the user-favorited unit.
+	void setFavoriteUnit(BattleUnit * unit);
 	/// Selects the previous soldier.
 	BattleUnit *selectPreviousPlayerUnit(bool checkReselect = false, bool setReselect = false, bool checkInventory = false);
 	/// Selects the next soldier.
