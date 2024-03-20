@@ -344,7 +344,13 @@ void ManufactureInfoState::moreEngineer(int change)
  */
 void ManufactureInfoState::moreEngineerPress(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT) _timerMoreEngineer->start();
+	switch (action->getDetails()->button.button)
+	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
+		_timerMoreEngineer->start();
+		break;
+	}
 }
 
 /**
@@ -353,10 +359,13 @@ void ManufactureInfoState::moreEngineerPress(Action *action)
  */
 void ManufactureInfoState::moreEngineerRelease(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	switch (action->getDetails()->button.button)
 	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
 		_timerMoreEngineer->setInterval(250);
 		_timerMoreEngineer->stop();
+		break;
 	}
 }
 
@@ -366,8 +375,18 @@ void ManufactureInfoState::moreEngineerRelease(Action *action)
  */
 void ManufactureInfoState::moreEngineerClick(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_RIGHT) moreEngineer(INT_MAX);
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT) moreEngineer(1);
+	switch (action->getDetails()->button.button)
+	{
+	case SDL_BUTTON_LEFT:
+		moreEngineer(1);
+		break;
+	case SDL_BUTTON_MIDDLE:
+		moreEngineer(BULK_AMOUNT_ENGINEERS);
+		break;
+	case SDL_BUTTON_RIGHT:
+		moreEngineer(INT_MAX);
+		break;
+	}
 }
 
 /**
@@ -393,7 +412,13 @@ void ManufactureInfoState::lessEngineer(int change)
  */
 void ManufactureInfoState::lessEngineerPress(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT) _timerLessEngineer->start();
+	switch (action->getDetails()->button.button)
+	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
+		_timerLessEngineer->start();
+		break;
+	}
 }
 
 /**
@@ -402,8 +427,10 @@ void ManufactureInfoState::lessEngineerPress(Action *action)
  */
 void ManufactureInfoState::lessEngineerRelease(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	switch (action->getDetails()->button.button)
 	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
 		_timerLessEngineer->setInterval(250);
 		_timerLessEngineer->stop();
 	}
@@ -415,8 +442,18 @@ void ManufactureInfoState::lessEngineerRelease(Action *action)
  */
 void ManufactureInfoState::lessEngineerClick(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_RIGHT) lessEngineer(INT_MAX);
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT) lessEngineer(1);
+	switch (action->getDetails()->button.button)
+	{
+	case SDL_BUTTON_LEFT:
+		lessEngineer(1);
+		break;
+	case SDL_BUTTON_MIDDLE:
+		lessEngineer(BULK_AMOUNT_ENGINEERS);
+		break;
+	case SDL_BUTTON_RIGHT:
+		lessEngineer(INT_MAX);
+		break;
+	}
 }
 
 /**
@@ -448,8 +485,13 @@ void ManufactureInfoState::moreUnit(int change)
  */
 void ManufactureInfoState::moreUnitPress(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT && _production->getAmountTotal() < INT_MAX)
-		_timerMoreUnit->start();
+	switch (action->getDetails()->button.button)
+	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
+		if (_production->getAmountTotal() < INT_MAX) _timerMoreUnit->start();
+		break;
+	}
 }
 
 /**
@@ -458,10 +500,13 @@ void ManufactureInfoState::moreUnitPress(Action *action)
  */
 void ManufactureInfoState::moreUnitRelease(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	switch (action->getDetails()->button.button)
 	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
 		_timerMoreUnit->setInterval(250);
 		_timerMoreUnit->stop();
+		break;
 	}
 }
 
@@ -472,8 +517,15 @@ void ManufactureInfoState::moreUnitRelease(Action *action)
 void ManufactureInfoState::moreUnitClick(Action *action)
 {
 	if (_production->getInfiniteAmount()) return; // We can't increase over infinite :)
-	if (action->getDetails()->button.button == SDL_BUTTON_RIGHT)
+	switch (action->getDetails()->button.button)
 	{
+	case SDL_BUTTON_LEFT:
+		moreUnit(1);
+		break;
+	case SDL_BUTTON_MIDDLE:
+		moreUnit(BULK_AMOUNT_ITEMS);
+		break;
+	case SDL_BUTTON_RIGHT:
 		if (_production->getRules()->getCategory() == "STR_CRAFT")
 		{
 			moreUnit(INT_MAX);
@@ -483,10 +535,7 @@ void ManufactureInfoState::moreUnitClick(Action *action)
 			_production->setInfiniteAmount(true);
 			setAssignedEngineer();
 		}
-	}
-	else if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
-	{
-		moreUnit(1);
+		break;
 	}
 }
 
@@ -497,9 +546,10 @@ void ManufactureInfoState::moreUnitClick(Action *action)
 void ManufactureInfoState::lessUnit(int change)
 {
 	if (change <= 0) return;
-	int units = _production->getAmountTotal();
-	change = std::min(units-(_production->getAmountProduced()+1), change);
-	_production->setAmountTotal(units-change);
+	_production->setAmountTotal(std::min(
+		_production->getAmountProduced() + 1,
+		_production->getAmountTotal() - change
+	));
 	setAssignedEngineer();
 }
 
@@ -509,7 +559,13 @@ void ManufactureInfoState::lessUnit(int change)
  */
 void ManufactureInfoState::lessUnitPress(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT) _timerLessUnit->start();
+	switch (action->getDetails()->button.button)
+	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
+		_timerLessUnit->start();
+		break;
+	}
 }
 
 /**
@@ -518,8 +574,10 @@ void ManufactureInfoState::lessUnitPress(Action *action)
  */
 void ManufactureInfoState::lessUnitRelease(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	switch (action->getDetails()->button.button)
 	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
 		_timerLessUnit->setInterval(250);
 		_timerLessUnit->stop();
 	}
@@ -531,17 +589,19 @@ void ManufactureInfoState::lessUnitRelease(Action *action)
  */
 void ManufactureInfoState::lessUnitClick(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_RIGHT
-	||  action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	_production->setInfiniteAmount(false);
+	switch (action->getDetails()->button.button)
 	{
-		_production->setInfiniteAmount(false);
-		if (action->getDetails()->button.button == SDL_BUTTON_RIGHT
-		|| _production->getAmountTotal() <= _production->getAmountProduced())
-		{ // So the produced item number is increased over the planned, OR it was simply a right-click
-			_production->setAmountTotal(_production->getAmountProduced()+1);
-			setAssignedEngineer();
-		}
-		if (action->getDetails()->button.button == SDL_BUTTON_LEFT) lessUnit(1);
+	case SDL_BUTTON_RIGHT:
+		lessUnit(INT_MAX);
+		break;
+	case SDL_BUTTON_MIDDLE:
+		lessUnit(BULK_AMOUNT_ITEMS);
+		break;
+	case SDL_BUTTON_LEFT:
+	default:
+		lessUnit(1);
+		break;
 	}
 }
 
@@ -551,7 +611,8 @@ void ManufactureInfoState::lessUnitClick(Action *action)
 void ManufactureInfoState::onMoreEngineer()
 {
 	_timerMoreEngineer->setInterval(50);
-	moreEngineer(1);
+	moreEngineer((SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_LMASK) ?
+		1 : BULK_AMOUNT_ENGINEERS);
 }
 
 /**
@@ -560,7 +621,8 @@ void ManufactureInfoState::onMoreEngineer()
 void ManufactureInfoState::onLessEngineer()
 {
 	_timerLessEngineer->setInterval(50);
-	lessEngineer(1);
+	lessEngineer((SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_LMASK) ?
+		1 : BULK_AMOUNT_ENGINEERS);
 }
 
 /**
@@ -579,7 +641,8 @@ void ManufactureInfoState::handleWheelEngineer(Action *action)
 void ManufactureInfoState::onMoreUnit()
 {
 	_timerMoreUnit->setInterval(50);
-	moreUnit(1);
+	moreUnit((SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_LMASK) ?
+		1 : BULK_AMOUNT_ITEMS);
 }
 
 /**
@@ -588,7 +651,8 @@ void ManufactureInfoState::onMoreUnit()
 void ManufactureInfoState::onLessUnit()
 {
 	_timerLessUnit->setInterval(50);
-	lessUnit(1);
+	lessUnit((SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_LMASK) ?
+		1 : BULK_AMOUNT_ITEMS);
 }
 
 /**

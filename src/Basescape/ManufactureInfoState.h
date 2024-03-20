@@ -50,6 +50,8 @@ private:
 	Timer * _timerMoreEngineer, * _timerMoreUnit, * _timerLessEngineer, * _timerLessUnit;
 	InteractiveSurface *_surfaceEngineers, *_surfaceUnits;
 	int _producedItemsValue;
+	static int const BULK_AMOUNT_ITEMS = 10;
+	static int const BULK_AMOUNT_ENGINEERS = 10;
 	/// Caches static data for monthly profit calculations
 	void initProfitInfo ();
 	/// Calculates the monthly change in funds due to the job

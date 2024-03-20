@@ -209,7 +209,13 @@ void ResearchInfoState::handleWheel(Action *action)
  */
 void ResearchInfoState::morePress(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT) _timerMore->start();
+	switch (action->getDetails()->button.button)
+	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
+		_timerMore->start();
+		break;
+	}
 }
 
 /**
@@ -218,8 +224,10 @@ void ResearchInfoState::morePress(Action *action)
  */
 void ResearchInfoState::moreRelease(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	switch (action->getDetails()->button.button)
 	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
 		_timerMore->setInterval(250);
 		_timerMore->stop();
 	}
@@ -232,10 +240,18 @@ void ResearchInfoState::moreRelease(Action *action)
  */
 void ResearchInfoState::moreClick(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_RIGHT)
-		moreByValue(INT_MAX);
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	switch (action->getDetails()->button.button)
+	{
+	case SDL_BUTTON_LEFT:
 		moreByValue(1);
+		break;
+	case SDL_BUTTON_MIDDLE:
+		moreByValue(BULK_AMOUNT_SCIENTISTS);
+		break;
+	case SDL_BUTTON_RIGHT:
+		moreByValue(INT_MAX);
+		break;
+	}
 }
 
 /**
@@ -244,7 +260,13 @@ void ResearchInfoState::moreClick(Action *action)
  */
 void ResearchInfoState::lessPress(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT) _timerLess->start();
+	switch (action->getDetails()->button.button)
+	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
+		_timerLess->start();
+		break;
+	}
 }
 
 /**
@@ -253,10 +275,13 @@ void ResearchInfoState::lessPress(Action *action)
  */
 void ResearchInfoState::lessRelease(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	switch (action->getDetails()->button.button)
 	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
 		_timerLess->setInterval(250);
 		_timerLess->stop();
+		break;
 	}
 }
 
@@ -267,10 +292,18 @@ void ResearchInfoState::lessRelease(Action *action)
  */
 void ResearchInfoState::lessClick(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_RIGHT)
-		lessByValue(INT_MAX);
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	switch (action->getDetails()->button.button)
+	{
+	case SDL_BUTTON_LEFT:
 		lessByValue(1);
+		break;
+	case SDL_BUTTON_MIDDLE:
+		lessByValue(BULK_AMOUNT_SCIENTISTS);
+		break;
+	case SDL_BUTTON_RIGHT:
+		lessByValue(INT_MAX);
+		break;
+	}
 }
 
 /**
@@ -279,7 +312,8 @@ void ResearchInfoState::lessClick(Action *action)
 void ResearchInfoState::more()
 {
 	_timerMore->setInterval(50);
-	moreByValue(1);
+	moreByValue((SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_LMASK) ?
+		1 : BULK_AMOUNT_SCIENTISTS);
 }
 
 /**
@@ -306,7 +340,8 @@ void ResearchInfoState::moreByValue(int change)
 void ResearchInfoState::less()
 {
 	_timerLess->setInterval(50);
-	lessByValue(1);
+	lessByValue((SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_LMASK) ?
+		1 : BULK_AMOUNT_SCIENTISTS);
 }
 
 /**
