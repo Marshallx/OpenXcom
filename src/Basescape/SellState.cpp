@@ -465,7 +465,13 @@ void SellState::btnCancelClick(Action *)
 void SellState::lstItemsLeftArrowPress(Action *action)
 {
 	_sel = _lstItems->getSelectedRow();
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT && !_timerInc->isRunning()) _timerInc->start();
+	switch (action->getDetails()->button.button)
+	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
+		if (!_timerInc->isRunning()) _timerInc->start();
+		break;
+	}
 }
 
 /**
@@ -474,9 +480,12 @@ void SellState::lstItemsLeftArrowPress(Action *action)
  */
 void SellState::lstItemsLeftArrowRelease(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	switch (action->getDetails()->button.button)
 	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
 		_timerInc->stop();
+		break;
 	}
 }
 
@@ -487,13 +496,20 @@ void SellState::lstItemsLeftArrowRelease(Action *action)
  */
 void SellState::lstItemsLeftArrowClick(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_RIGHT) changeByValue(INT_MAX, 1);
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	switch (action->getDetails()->button.button)
 	{
-		changeByValue(1,1);
-		_timerInc->setInterval(250);
-		_timerDec->setInterval(250);
+	case SDL_BUTTON_LEFT:
+		changeByValue(1, 1);
+		break;
+	case SDL_BUTTON_MIDDLE:
+		changeByValue(BULK_AMOUNT, 1);
+		break;
+	case SDL_BUTTON_RIGHT:
+		changeByValue(INT_MAX, 1);
+		return;
 	}
+	_timerInc->setInterval(250);
+	_timerDec->setInterval(250);
 }
 
 /**
@@ -503,7 +519,13 @@ void SellState::lstItemsLeftArrowClick(Action *action)
 void SellState::lstItemsRightArrowPress(Action *action)
 {
 	_sel = _lstItems->getSelectedRow();
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT && !_timerDec->isRunning()) _timerDec->start();
+	switch (action->getDetails()->button.button)
+	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
+		if (!_timerDec->isRunning()) _timerDec->start();
+		break;
+	}
 }
 
 /**
@@ -512,9 +534,12 @@ void SellState::lstItemsRightArrowPress(Action *action)
  */
 void SellState::lstItemsRightArrowRelease(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	switch (action->getDetails()->button.button)
 	{
+	case SDL_BUTTON_LEFT:
+	case SDL_BUTTON_MIDDLE:
 		_timerDec->stop();
+		break;
 	}
 }
 
@@ -525,13 +550,20 @@ void SellState::lstItemsRightArrowRelease(Action *action)
  */
 void SellState::lstItemsRightArrowClick(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_RIGHT) changeByValue(INT_MAX, -1);
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	switch (action->getDetails()->button.button)
 	{
-		changeByValue(1,-1);
-		_timerInc->setInterval(250);
-		_timerDec->setInterval(250);
+	case SDL_BUTTON_LEFT:
+		changeByValue(1, -1);
+		break;
+	case SDL_BUTTON_MIDDLE:
+		changeByValue(BULK_AMOUNT, -1);
+		break;
+	case SDL_BUTTON_RIGHT:
+		changeByValue(INT_MAX, -1);
+		return;
 	}
+	_timerInc->setInterval(250);
+	_timerDec->setInterval(250);
 }
 
 /**
@@ -541,26 +573,23 @@ void SellState::lstItemsRightArrowClick(Action *action)
 void SellState::lstItemsMousePress(Action *action)
 {
 	_sel = _lstItems->getSelectedRow();
-	if (action->getDetails()->button.button == SDL_BUTTON_WHEELUP)
+	int direction = 1;
+	switch (action->getDetails()->button.button)
 	{
+	case SDL_BUTTON_WHEELDOWN:
+		direction = -1;
+		[[fallthrough]]
+	case SDL_BUTTON_WHEELUP:
 		_timerInc->stop();
 		_timerDec->stop();
 		if (action->getAbsoluteXMouse() >= _lstItems->getArrowsLeftEdge() &&
 			action->getAbsoluteXMouse() <= _lstItems->getArrowsRightEdge())
 		{
-			changeByValue(Options::changeValueByMouseWheel, 1);
+			changeByValue(Options::changeValueByMouseWheel,direction);
 		}
+		break;
 	}
-	else if (action->getDetails()->button.button == SDL_BUTTON_WHEELDOWN)
-	{
-		_timerInc->stop();
-		_timerDec->stop();
-		if (action->getAbsoluteXMouse() >= _lstItems->getArrowsLeftEdge() &&
-			action->getAbsoluteXMouse() <= _lstItems->getArrowsRightEdge())
-		{
-			changeByValue(Options::changeValueByMouseWheel, -1);
-		}
-	}
+
 }
 
 /**
@@ -570,7 +599,8 @@ void SellState::increase()
 {
 	_timerDec->setInterval(50);
 	_timerInc->setInterval(50);
-	changeByValue(1,1);
+	changeByValue((SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_LMASK) ?
+		1 : BULK_AMOUNT, 1);
 }
 
 /**
@@ -642,7 +672,8 @@ void SellState::decrease()
 {
 	_timerInc->setInterval(50);
 	_timerDec->setInterval(50);
-	changeByValue(1,-1);
+	changeByValue((SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_LMASK) ?
+		1 : BULK_AMOUNT, -1);
 }
 
 /**

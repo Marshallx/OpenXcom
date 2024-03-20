@@ -57,6 +57,7 @@ private:
 	double _distance;
 	Uint8 _ammoColor;
 	Timer *_timerInc, *_timerDec;
+	static int const BULK_AMOUNT = 10;
 	/// Gets the category of the current selection.
 	std::string getCategory(int sel) const;
 	/// Gets the row of the current selection.
@@ -100,6 +101,8 @@ public:
 	void decrease();
 	/// Decreases the quantity of an item by the given value.
 	void decreaseByValue(int change);
+	/// Changes the quantity of an item by the given value.
+	void changeByValue(int change, int dir);
 	/// Updates the quantity-strings of the selected item.
 	void updateItemStrings();
 	/// Gets the total of the transfer.

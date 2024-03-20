@@ -58,6 +58,7 @@ private:
 	Timer *_timerInc, *_timerDec;
 	Uint8 _ammoColor;
 	OptionsOrigin _origin;
+	static int const BULK_AMOUNT = 10;
 	/// Gets the category of the current selection.
 	std::string getCategory(int sel) const;
 	/// Gets the row of the current selection.

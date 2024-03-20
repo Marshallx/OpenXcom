@@ -50,6 +50,7 @@ private:
 	void buildUi();
 	Timer *_timerMore, *_timerLess;
 	InteractiveSurface *_surfaceScientists;
+	static int const BULK_AMOUNT_SCIENTISTS = 10;
 public:
 	/// Creates the ResearchProject state.
 	ResearchInfoState(Base *base, RuleResearch *rule);
