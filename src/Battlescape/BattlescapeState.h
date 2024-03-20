@@ -225,6 +225,10 @@ public:
 	void stopScrolling(Action *action);
 	/// Autosave next turn.
 	void autosave();
+
+	void btnFaveSoldierSelectClick(Action *);
+	void btnFaveSoldierSetClick(Action *);
+	void btnFaveSoldierCenterClick(Action *);
 };
 
 }

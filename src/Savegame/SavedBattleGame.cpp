@@ -49,7 +49,7 @@ namespace OpenXcom
  */
 SavedBattleGame::SavedBattleGame() : _battleState(0), _mapsize_x(0), _mapsize_y(0), _mapsize_z(0), _selectedUnit(0), _lastSelectedUnit(0), _pathfinding(0), _tileEngine(0), _globalShade(0),
 	_side(FACTION_PLAYER), _turn(1), _debugMode(false), _aborted(false), _itemId(0), _objectiveType(-1), _objectivesDestroyed(0), _objectivesNeeded(0), _unitsFalling(false), _cheating(false),
-	_tuReserved(BA_NONE), _kneelReserved(false), _depth(0), _ambience(-1), _ambientVolume(0.5), _turnLimit(0), _cheatTurn(20), _chronoTrigger(FORCE_LOSE), _beforeGame(true)
+	_tuReserved(BA_NONE), _kneelReserved(false), _depth(0), _ambience(-1), _ambientVolume(0.5), _turnLimit(0), _cheatTurn(20), _chronoTrigger(FORCE_LOSE), _beforeGame(true), _favoriteUnit(0)
 {
 	_tileSearch.resize(11*11);
 	for (int i = 0; i < 121; ++i)
@@ -127,6 +127,7 @@ void SavedBattleGame::load(const YAML::Node &node, Mod *mod, SavedGame* savedGam
 	_turn = node["turn"].as<int>(_turn);
 	_depth = node["depth"].as<int>(_depth);
 	int selectedUnit = node["selectedUnit"].as<int>();
+	int favoriteUnit = !!node["favoriteUnit"] ? node["favoriteUnit"].as<int>() : -1;
 
 	for (YAML::const_iterator i = node["mapdatasets"].begin(); i != node["mapdatasets"].end(); ++i)
 	{
@@ -219,6 +220,8 @@ void SavedBattleGame::load(const YAML::Node &node, Mod *mod, SavedGame* savedGam
 		{
 			if ((unit->getId() == selectedUnit) || (_selectedUnit == 0 && !unit->isOut()))
 				_selectedUnit = unit;
+			if ((unit->getId() == favoriteUnit))
+				_favoriteUnit = unit;
 		}
 		if (unit->getStatus() != STATUS_DEAD && unit->getStatus() != STATUS_IGNORE_ME)
 		{
@@ -399,6 +402,7 @@ YAML::Node SavedBattleGame::save() const
 	node["globalshade"] = _globalShade;
 	node["turn"] = _turn;
 	node["selectedUnit"] = (_selectedUnit?_selectedUnit->getId():-1);
+	node["favoriteUnit"] = (_favoriteUnit?_favoriteUnit->getId():-1);
 	for (std::vector<MapDataSet*>::const_iterator i = _mapDataSets.begin(); i != _mapDataSets.end(); ++i)
 	{
 		node["mapdatasets"].push_back((*i)->getName());
@@ -644,6 +648,24 @@ BattleUnit *SavedBattleGame::getSelectedUnit() const
 void SavedBattleGame::setSelectedUnit(BattleUnit *unit)
 {
 	_selectedUnit = unit;
+}
+
+/**
+ * Gets the user-favorited unit
+ * @return Pointer to BattleUnit.
+ */
+BattleUnit * SavedBattleGame::getFavoriteUnit() const
+{
+	return _favoriteUnit;
+}
+
+/**
+ * Sets the user-favorited unit.
+ * @param unit Pointer to BattleUnit.
+ */
+void SavedBattleGame::setFavoriteUnit(BattleUnit * unit)
+{
+	_favoriteUnit = unit;
 }
 
 /**
