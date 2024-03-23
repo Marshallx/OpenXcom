@@ -1,0 +1,6 @@
+name: "Action Warning Ribbon"
+version: 1.0
+description: "Changes \"not enough time units\" type messages to a thin ribbon above the Battlescape buttons, so as not to obscure aquanaut info."
+author: TheDash
+
+master: xcom2

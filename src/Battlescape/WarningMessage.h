@@ -41,6 +41,10 @@ public:
 	WarningMessage(int width, int height, int x = 0, int y = 0);
 	/// Cleans up the warning message.
 	~WarningMessage();
+	/// Sets the width of the surface.
+	void setWidth(int width);
+	/// Sets the height of the surface.
+	void setHeight(int height);
 	/// Sets the color for the warning message.
 	void setColor(Uint8 color);
 	/// Sets the text color for the warning message.

@@ -74,6 +74,28 @@ void WarningMessage::setTextColor(Uint8 color)
 }
 
 /**
+ * Changes the width of the surface.
+ * @param width New width in pixels.
+ */
+void WarningMessage::setWidth(int width)
+{
+	Surface::setWidth(width);
+	_text->setWidth(width);
+}
+
+/**
+ * Changes the height of the surface.
+ * @warning This is not a trivial setter!
+ * It will force the surface to be recreated for the new size.
+ * @param height New height in pixels.
+ */
+void WarningMessage::setHeight(int height)
+{
+	Surface::setHeight(height);
+	_text->setHeight(height);
+}
+
+/**
  * Changes the various resources needed for text rendering.
  * The different fonts need to be passed in advance since the
  * text size can change mid-text, and the language affects
