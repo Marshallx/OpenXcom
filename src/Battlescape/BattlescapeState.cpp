@@ -1210,22 +1210,43 @@ void BattlescapeState::btnVisibleUnitClick(Action *action)
 	// Consume the event
 	action->getDetails()->type = SDL_NOEVENT;
 
-	// Find out which button was pressed
+	bool alt = SDL_BUTTON_RIGHT == action->getDetails()->button.button;
+
+	// Find out which button was pressed -> which unit to center on
+	BattleUnit * target = nullptr;
+
 	for (int i = 0; i < VisibleUnitButton::VISIBLE_MAX; ++i)
 	{
 		if (action->getSender() == _btnVisibleUnit[i]->GetButton())
 		{
-			_map->getCamera()->centerOnPosition(_btnVisibleUnit[i]->GetUnit()->getPosition());
-			return;
+			target = alt
+				? _btnVisibleUnit[i]->GetSpotter(_save->getUnits(), _save->getSelectedUnit())
+				: _btnVisibleUnit[i]->GetUnit();
+			break;
 		}
 	}
 
-	for (int i = 0; i < VisibleUnitButton::SPOTTED_MAX; ++i)
+	if (!target)
 	{
-		if (action->getSender() == _btnSpottedUnit[i]->GetButton())
+		for (int i = 0; i < VisibleUnitButton::SPOTTED_MAX; ++i)
 		{
-			_map->getCamera()->centerOnPosition(_btnSpottedUnit[i]->GetUnit()->getPosition());
-			return;
+			if (action->getSender() == _btnSpottedUnit[i]->GetButton())
+			{
+				target = alt
+					? _btnSpottedUnit[i]->GetSpotter(_save->getUnits(), _save->getSelectedUnit())
+					: _btnSpottedUnit[i]->GetUnit();
+				break;
+			}
+		}
+	}
+
+	if (target)
+	{
+		_map->getCamera()->centerOnPosition(target->getPosition());
+		if (alt)
+		{
+			_save->setSelectedUnit(target);
+			updateSoldierInfo();
 		}
 	}
 }

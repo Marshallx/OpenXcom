@@ -71,6 +71,7 @@ namespace OpenXcom
 		unit_ = nullptr;
 
 		button_->onMouseClick((ActionHandler)&BattlescapeState::btnVisibleUnitClick);
+		button_->onMouseClick((ActionHandler)&BattlescapeState::btnVisibleUnitClick, SDL_BUTTON_RIGHT);
 		button_->onKeyboardPress((ActionHandler)&BattlescapeState::btnVisibleUnitClick, key);
 		button_->onMouseIn((ActionHandler)&BattlescapeState::txtTooltipIn);
 		button_->onMouseOut((ActionHandler)&BattlescapeState::txtTooltipOut);
@@ -172,6 +173,36 @@ namespace OpenXcom
 		Element aa = ApplyDefaults(a);
 		Element bb = ApplyDefaults(b);
 		return aa.x == bb.x && aa.y == bb.y;
+	}
+
+	BattleUnit * VisibleUnitButton::GetSpotter(std::vector<BattleUnit*> * units, BattleUnit * selected)
+	{
+		for (std::vector<BattleUnit *>::iterator i = units->begin(); i != units->end(); ++i)
+		{
+			auto spotter = *i;
+			if (spotter->getFaction() != FACTION_PLAYER) continue;
+
+			if (selected)
+			{
+				// Allow cycling through all spotters
+				if (spotter == selected) selected = nullptr;
+				continue;
+			}
+
+			auto visible = spotter->getVisibleUnits();
+			if (std::find(visible->begin(), visible->end(), GetUnit()) != visible->end()) return spotter;
+		}
+
+		// No spotter found between selected and end. Now check from beginning
+		for (std::vector<BattleUnit *>::iterator i = units->begin(); i != units->end(); ++i)
+		{
+			auto spotter = *i;
+			if (spotter->getFaction() != FACTION_PLAYER) continue;
+			auto visible = spotter->getVisibleUnits();
+			if (std::find(visible->begin(), visible->end(), GetUnit()) != visible->end()) return spotter;
+		}
+
+		return nullptr;
 	}
 
 }

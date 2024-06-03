@@ -546,7 +546,7 @@ void ManufactureInfoState::moreUnitClick(Action *action)
 void ManufactureInfoState::lessUnit(int change)
 {
 	if (change <= 0) return;
-	_production->setAmountTotal(std::min(
+	_production->setAmountTotal(std::max(
 		_production->getAmountProduced() + 1,
 		_production->getAmountTotal() - change
 	));

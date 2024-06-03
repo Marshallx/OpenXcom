@@ -47,12 +47,13 @@ class VisibleUnitButton
 	static void Recenter(int screenWidth, int count, VisibleUnitButton **const buttons, Element const * modElement) noexcept;
 	void Reset() noexcept;
 
-	InteractiveSurface *GetButton() const noexcept;
-	NumberText *GetCaption() const noexcept;
-	BattleUnit *GetUnit() const noexcept;
+	InteractiveSurface * GetButton() const noexcept;
+	NumberText * GetCaption() const noexcept;
+	BattleUnit * GetUnit() const noexcept;
 	int GetBackgroundColor() const noexcept;
 	int GetBorderColor() const noexcept;
 	bool UseShortCycle() const noexcept;
+	BattleUnit * GetSpotter(std::vector<BattleUnit *> * units, BattleUnit * selected);
 
 	static bool TargetIsEligible(BattleUnit const * target, VisibleUnitButton ** const visibleUnitButtons, VisibleUnitButton ** const spottedUnitButtons);
 
